@@ -107,9 +107,15 @@
         </div>
 
         <section class="extras" id="extras" hidden>
-          <h2 class="extras__title">Дополнительные слова</h2>
-          <p class="extras__hint">Слишком длинные для сетки ответы — набирай их в клетках ниже.</p>
-          <div class="extras__list" id="extras-list"></div>
+          <button class="extras__toggle" id="extras-toggle" type="button" aria-expanded="false" aria-controls="extras-body">
+            <span>Дополнительное слово</span>
+            <span class="pill" id="extras-count">1</span>
+          </button>
+          <div class="extras__body" id="extras-body">
+            <h2 class="extras__title">Дополнительные слова</h2>
+            <p class="extras__hint">Слишком длинные для сетки ответы — набирай их в клетках ниже.</p>
+            <div class="extras__list" id="extras-list"></div>
+          </div>
         </section>
 
         <div class="keyboard" id="keyboard" aria-label="Экранная клавиатура"></div>
@@ -214,6 +220,22 @@
       <p class="hint-plate" id="hint-text"></p>
       <div class="modal__actions">
         <button class="btn btn--primary btn--wide" id="btn-hint-ok" type="button">Понятно</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Попытки закончились -->
+  <div class="modal" id="modal-attempts" hidden>
+    <div class="modal__backdrop"></div>
+    <div class="modal__card modal__card--center" role="dialog" aria-modal="true" aria-labelledby="attempts-title">
+      <p class="eyebrow">Попытки закончились</p>
+      <h2 class="modal__title" id="attempts-title">Несколько ошибок подряд</h2>
+      <p class="modal__note" id="attempts-text">
+        Вы несколько раз ответили неправильно. Чтобы продолжить играть,
+        нужно решить небольшое судоку 4×4 — правила будут рядом с полем.
+      </p>
+      <div class="modal__actions">
+        <button class="btn btn--primary btn--wide" id="btn-attempts-sudoku" type="button">Собрать судоку</button>
       </div>
     </div>
   </div>

@@ -147,6 +147,8 @@
     el.boardEmpty = $('board-empty');
     el.extras = $('extras');
     el.extrasList = $('extras-list');
+    el.extrasToggle = $('extras-toggle');
+    el.extrasCount = $('extras-count');
     el.keyboard = $('keyboard');
 
     el.screenSudoku = $('screen-sudoku');
@@ -160,6 +162,8 @@
     el.modalDone = $('modal-level-done');
     el.modalConfirm = $('modal-confirm');
     el.modalHint = $('modal-hint');
+    el.modalAttempts = $('modal-attempts');
+    el.btnAttemptsSudoku = $('btn-attempts-sudoku');
     el.hintText = $('hint-text');
     el.btnHintClose = $('btn-hint-close');
     el.btnHintOk = $('btn-hint-ok');
@@ -243,13 +247,13 @@
   }
 
   function closeAllModals() {
-    [el.modalMenu, el.modalHowto, el.modalDone, el.modalConfirm, el.modalHint].forEach(function (node) {
+    [el.modalMenu, el.modalHowto, el.modalDone, el.modalConfirm, el.modalHint, el.modalAttempts].forEach(function (node) {
       if (node) node.hidden = true;
     });
   }
 
   function anyModalOpen() {
-    return [el.modalMenu, el.modalHowto, el.modalDone, el.modalConfirm, el.modalHint].some(function (node) {
+    return [el.modalMenu, el.modalHowto, el.modalDone, el.modalConfirm, el.modalHint, el.modalAttempts].some(function (node) {
       return node && !node.hidden;
     });
   }
@@ -492,6 +496,8 @@
 
     renderBoard();
     renderExtras();
+    el.extras.classList.remove('is-open');
+    el.extrasToggle.setAttribute('aria-expanded', 'false');
     updateHud();
 
     const first = firstUnsolvedWord();
@@ -508,7 +514,7 @@
     Platform.gameplayStart();
 
     if (!isLevelComplete() && game.attemptsLeft <= 0) {
-      openSudoku();
+      showAttemptsBanner();
     }
   }
 
@@ -586,6 +592,7 @@
   function renderExtras() {
     const extras = game.words.filter(function (word) { return !word.isGrid; });
     el.extras.hidden = extras.length === 0;
+    if (el.extrasCount) el.extrasCount.textContent = String(extras.length);
     el.extrasList.innerHTML = '';
 
     extras.forEach(function (word) {
@@ -788,13 +795,14 @@
     const board = game.prepared.board;
     const gap = 2;
     const rect = el.boardPanel.getBoundingClientRect();
-    const fallback = window.innerHeight * 0.42;
+    const fallback = Math.min(window.innerHeight * 0.42, 420);
     const availableWidth = Math.max(140, rect.width - 6);
-    const availableHeight = Math.max(140, (rect.height > 120 ? rect.height : fallback) - 6);
+    const panelHeight = rect.height > 60 ? rect.height : fallback;
+    const availableHeight = Math.max(80, panelHeight - 6);
 
     const byWidth = (availableWidth - (board.width - 1) * gap) / board.width;
     const byHeight = (availableHeight - (board.height - 1) * gap) / board.height;
-    const size = clamp(Math.floor(Math.min(byWidth, byHeight)), 15, 46);
+    const size = clamp(Math.floor(Math.min(byWidth, byHeight)), 14, 46);
 
     document.documentElement.style.setProperty('--cell', size + 'px');
   }
@@ -1086,7 +1094,7 @@
     }
 
     if (word.isGrid && game.attemptsLeft <= 0) {
-      openSudoku();
+      showAttemptsBanner();
     }
 
     return false;
@@ -1348,6 +1356,11 @@
 
   /* --------------------------------------------------------------- судоку */
 
+  function showAttemptsBanner() {
+    if (!el.modalAttempts) return;
+    openModal(el.modalAttempts);
+  }
+
   function openSudoku() {
     if (!el.screenSudoku || !el.sudokuBoard) return;
 
@@ -1602,6 +1615,17 @@
     el.btnHintClose.addEventListener('click', function () { closeModal(el.modalHint); });
     el.btnHintOk.addEventListener('click', function () { closeModal(el.modalHint); });
 
+    el.btnAttemptsSudoku.addEventListener('click', function () {
+      closeModal(el.modalAttempts);
+      openSudoku();
+    });
+
+    el.extrasToggle.addEventListener('click', function () {
+      var open = el.extras.classList.toggle('is-open');
+      el.extrasToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      requestAnimationFrame(fitBoard);
+    });
+
 
     el.btnMenu.addEventListener('click', function () {
       if (el.screenGame.hidden) return;
@@ -1751,6 +1775,7 @@
     }
 
     if (event.key === 'Escape') {
+      if (!el.modalAttempts.hidden) return;
       if (!el.modalHint.hidden) { closeModal(el.modalHint); return; }
       if (!el.modalConfirm.hidden) { closeModal(el.modalConfirm); return; }
       if (!el.modalHowto.hidden) { closeModal(el.modalHowto); return; }
@@ -1816,6 +1841,15 @@
         break;
     }
   }
+
+  // Небольшой API для админ-панели и отладочных страниц.
+  window.GameApp = {
+    startLevel: function (index) { startLevel(index); },
+    levelTitles: function () {
+      return levelMeta.map(function (level) { return level.title; });
+    },
+    isPlaying: function () { return Boolean(game); }
+  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

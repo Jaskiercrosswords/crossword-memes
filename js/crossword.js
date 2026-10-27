@@ -9,9 +9,9 @@
   'use strict';
 
   // Слово длиннее этого не ставим в сетку, а показываем как дополнительное.
-  const MAX_WORD_LENGTH = 13;
+  const MAX_WORD_LENGTH = 15;
   // Максимальный размер сетки по каждой стороне.
-  const MAX_GRID_SIZE = 14;
+  const MAX_GRID_SIZE = 15;
   // Сколько вопросов в одном уровне.
   const WORDS_PER_LEVEL = 10;
   // Сколько подсказок доступно на уровень.
@@ -167,8 +167,8 @@
       return a.question.id - b.question.id;
     });
 
-    const gridPool = sorted.slice(0, gridCount);
-    const leftover = sorted.slice(gridCount).map(function (item) {
+    const gridPool = sorted.slice(Math.max(0, sorted.length - gridCount));
+    const leftover = sorted.slice(0, Math.max(0, sorted.length - gridCount)).map(function (item) {
       return item.question;
     });
 

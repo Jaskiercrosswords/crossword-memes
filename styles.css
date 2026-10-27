@@ -1448,3 +1448,55 @@ button {
     order: -1;
   }
 }
+
+/* ------------------------------------- доп. слова: сворачивание на мобильных */
+
+.extras__toggle {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 2px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #8d3f62;
+  text-align: left;
+}
+
+.extras__toggle::after {
+  content: '+';
+  margin-left: auto;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--accent-deep);
+}
+
+.extras.is-open .extras__toggle::after {
+  content: '−';
+}
+
+@media (max-width: 899px) {
+  .extras {
+    padding: 0 12px;
+    max-height: none;
+  }
+
+  .extras__toggle {
+    display: flex;
+  }
+
+  .extras__body {
+    display: none;
+    padding-bottom: 12px;
+  }
+
+  .extras.is-open .extras__body {
+    display: block;
+  }
+
+  .extras.is-open {
+    max-height: 24vh;
+    overflow-y: auto;
+  }
+}
