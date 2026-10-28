@@ -755,23 +755,23 @@
     return 'букв';
   }
 
-  function gridSolvedCount() {
+function gridSolvedCount() {
     if (!game) return 0;
-    return game.gridWords.filter(function (word) {
+    return game.words.filter(function (word) {
       return game.solved.has(word.id);
     }).length;
   }
 
   function isLevelComplete() {
     if (!game) return false;
-    return gridSolvedCount() >= game.gridWords.length;
+    return gridSolvedCount() >= game.words.length;
   }
 
   function updateHud() {
     if (!game) return;
     const level = levelMeta[game.levelIndex];
     const solvedCount = gridSolvedCount();
-    const total = game.gridWords.length;
+    const total = game.words.length;
     const attemptsTotal = C.ATTEMPTS_PER_LEVEL;
 
     el.levelTitle.textContent = level.title + ' из ' + levelMeta.length;
@@ -1338,7 +1338,7 @@
 
     el.doneEyebrow.textContent = isLast ? 'Все уровни пройдены!' : 'Уровень пройден!';
     el.doneTitle.textContent = level.title;
-    el.doneWords.textContent = gridSolvedCount() + ' из ' + game.gridWords.length;
+    el.doneWords.textContent = gridSolvedCount() + ' из ' + game.words.length;
     el.doneHints.textContent = String(game.hintsUsed);
 
     el.btnNextLevel.hidden = isLast;
