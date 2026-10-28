@@ -1500,3 +1500,29 @@ button {
     overflow-y: auto;
   }
 }
+
+@media (max-width: 899px) {
+  .kb-key--wide {
+    font-size: 9px;
+  }
+}
+
+.start-sound {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  z-index: 5;
+  min-height: 34px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.85);
+  color: #7a3556;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.start-sound[aria-pressed="true"] {
+  background: #f4e0ea;
+  border-color: var(--accent);
+}

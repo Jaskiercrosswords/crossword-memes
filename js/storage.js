@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Сохранение прогресса. Работает только с localStorage и никогда не
  * роняет игру: при запрете хранилища всё живёт в памяти до перезагрузки.
  */
@@ -14,7 +14,7 @@
       currentLevel: 0,
       totalSolved: 0,
       levels: {},
-      settings: { sound: false }
+      settings: { sound: true }
     };
   }
 
@@ -36,7 +36,7 @@
     const result = {
       solved: [],
       revealed: {},
-      hintsLeft: 3,
+      hintsLeft: 4,
       hintsUsed: 0,
       attemptsLeft: 4,
       completed: false
@@ -60,7 +60,7 @@
     }
 
     if (Number.isInteger(value.hintsLeft)) {
-      result.hintsLeft = Math.max(0, Math.min(3, value.hintsLeft));
+      result.hintsLeft = Math.max(0, Math.min(4, value.hintsLeft));
     }
     if (Number.isInteger(value.hintsUsed)) {
       result.hintsUsed = Math.max(0, value.hintsUsed);

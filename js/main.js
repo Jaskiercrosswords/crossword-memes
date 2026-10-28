@@ -172,7 +172,8 @@
     el.btnMenuClose = $('btn-menu-close');
     el.btnResume = $('btn-resume');
     el.btnHowto2 = $('btn-howto-2');
-    el.btnSound = $('btn-sound');
+el.btnSound = $('btn-sound');
+    el.startSound = $('start-sound');
     el.soundLabel = $('sound-label');
     el.btnReset = $('btn-reset');
     el.levelList = $('level-list');
@@ -1250,13 +1251,8 @@ function gridSolvedCount() {
         return revealed.indexOf(item.index) === -1 && !isFixed(item.cell.key);
       });
 
-    if (openable.length === 0) {
-      showToast('В этом слове уже открыты все буквы');
-      return;
-    }
-
-    if (revealed.length >= 2 || openable.length <= 1) {
-      revealWholeWord(word);
+if (openable.length === 0) {
+      showToast('В этом слове уже открыты все буквы или оно решено');
       return;
     }
 
@@ -1289,22 +1285,7 @@ function gridSolvedCount() {
     if (isWordFilled(word)) checkWord(word, { auto: true });
   }
 
-  function revealWholeWord(word) {
-    if (game.hintsLeft <= 0) {
-      showToast('Подсказки на этот уровень закончились', true);
-      return;
-    }
-
-    game.hintsLeft -= 1;
-    game.hintsUsed += 1;
-    markSolved(word);
-
-    playTone(440, 0.12);
-    showToast('Слово открыто целиком');
-    saveGame();
-  }
-
-  /* ------------------------------------------------------- прогресс */
+/* ------------------------------------------------------- прогресс */
 
   function saveGame() {
     if (!game) return;
@@ -1635,12 +1616,14 @@ function gridSolvedCount() {
     el.btnMenuClose.addEventListener('click', function () { closeModal(el.modalMenu); });
     el.btnResume.addEventListener('click', function () { closeModal(el.modalMenu); });
 
-    el.btnSound.addEventListener('click', function () {
+function toggleSound() {
       progress.settings.sound = !progress.settings.sound;
       Store.save(progress);
       updateSoundUi();
       if (progress.settings.sound) playTone(520, 0.08);
-    });
+    }
+    if (el.btnSound) el.btnSound.addEventListener('click', toggleSound);
+    if (el.startSound) el.startSound.addEventListener('click', toggleSound);
 
     el.btnReset.addEventListener('click', function () {
       closeModal(el.modalMenu);
@@ -1750,10 +1733,14 @@ function gridSolvedCount() {
     });
   }
 
-  function updateSoundUi() {
+function updateSoundUi() {
     const enabled = Boolean(progress.settings && progress.settings.sound);
-    el.btnSound.setAttribute('aria-pressed', enabled ? 'true' : 'false');
-    el.soundLabel.textContent = enabled ? 'Звук: включён' : 'Звук: выключен';
+    if (el.btnSound) el.btnSound.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+    if (el.startSound) {
+      el.startSound.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+      el.startSound.textContent = enabled ? 'Звук: вкл' : 'Звук: выкл';
+    }
+    if (el.soundLabel) el.soundLabel.textContent = enabled ? 'Звук: включён' : 'Звук: выключен';
   }
 
   function onKeyDown(event) {

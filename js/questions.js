@@ -62,7 +62,7 @@
     { id: 54, question: "Герой, выражающий чувства автора", answer: "лирический", acceptedAnswers: ["лирический"] },
     { id: 55, question: "Студия, создавшая \"унесённые призраками\"", answer: "гибли", acceptedAnswers: ["гибли"] },
     { id: 56, question: "Фильм о мальчике волшебнике с молнией на лбу", answer: "Гарри поттер", acceptedAnswers: ["Гарри поттер"] },
-    { id: 57, question: "Антиутопия Джорджа Оруэлла", answer: "1984", acceptedAnswers: ["1984"] },
+    { id: 57, question: "Автор «норвежского леса»", answer: "мураками", acceptedAnswers: ["мураками"] },
     { id: 58, question: "Многосерийный фильм с продолжением", answer: "сериал", acceptedAnswers: ["сериал"] },
     { id: 59, question: "Литературный образ идеального мира", answer: "утопия", acceptedAnswers: ["утопия"] },
     { id: 60, question: "Древнее предание", answer: "легенда", acceptedAnswers: ["легенда"] },
