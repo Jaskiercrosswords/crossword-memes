@@ -19,8 +19,23 @@ function write(file, data) {
   fs.writeFileSync(path.join(out, file), data, 'utf8');
 }
 
-fs.rmSync(out, { recursive: true, force: true });
+// Не удаляем весь каталог: в admin-site живёт свой git-репозиторий (.git).
+fs.mkdirSync(out, { recursive: true });
 fs.mkdirSync(path.join(out, 'js'), { recursive: true });
+['index.html', 'styles.css', 'admin.css'].forEach(function (file) {
+  try {
+    fs.unlinkSync(path.join(out, file));
+  } catch (error) {
+    /* файла нет — не страшно */
+  }
+});
+fs.readdirSync(path.join(out, 'js')).forEach(function (file) {
+  try {
+    fs.unlinkSync(path.join(out, 'js', file));
+  } catch (error) {
+    /* ignore */
+  }
+});
 
 let html = read('index.html');
 

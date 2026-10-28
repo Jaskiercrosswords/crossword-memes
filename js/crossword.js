@@ -11,7 +11,7 @@
   // Слово длиннее этого не ставим в сетку, а показываем как дополнительное.
   const MAX_WORD_LENGTH = 15;
   // Максимальный размер сетки по каждой стороне.
-  const MAX_GRID_SIZE = 15;
+  const MAX_GRID_SIZE = 16;
   // Сколько вопросов в одном уровне.
   const WORDS_PER_LEVEL = 10;
   // Сколько подсказок доступно на уровень.
@@ -626,8 +626,8 @@
 
     const layout = generateCrossword(entries, {
       maxSize: MAX_GRID_SIZE,
-      attempts: 30,
-      nodeBudget: 6000,
+      attempts: 60,
+      nodeBudget: 12000,
       seed: 7919 + level.index * 131
     });
 

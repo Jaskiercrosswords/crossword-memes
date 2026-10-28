@@ -177,7 +177,9 @@ function renderAppendix() {
     + '</table></section>';
 }
 
-const totalWords = prepared.reduce(function (sum, level) { return sum + level.questions.length + level.extraIds.length; }, 0);
+const uniqueIds = new Set();
+questions.forEach(function (q) { uniqueIds.add(q.id); });
+const totalWords = uniqueIds.size;
 
 const html = `<!DOCTYPE html>
 <html lang="ru">
