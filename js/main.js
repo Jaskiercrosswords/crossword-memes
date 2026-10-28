@@ -19,8 +19,8 @@
   const KEYBOARD_ROWS = ['ЙЦУКЕНГШЩЗХЪ', 'ФЫВАПРОЛДЖЭ', 'ЯЧСМИТЬБЮЁ'];
   const DIGITS = '1234567890';
 
-  // Шесть лёгких судоку 4×4 с единственным решением.
-  const SUDOKU_PUZZLES = [
+  // Лёгкие судоку 4×4 для награды «попытки» и 9×9 для награды «подсказки».
+  const SUDOKU_ATTEMPTS = [
     {
       solution: [[4, 3, 2, 1], [2, 1, 4, 3], [3, 4, 1, 2], [1, 2, 3, 4]],
       givens: [[0, 3, 2, 1], [0, 1, 0, 3], [0, 0, 1, 0], [0, 2, 0, 0]]
@@ -30,20 +30,39 @@
       givens: [[4, 0, 0, 1], [0, 1, 0, 3], [0, 4, 0, 0], [1, 2, 0, 0]]
     },
     {
-      solution: [[4, 3, 2, 1], [2, 1, 4, 3], [3, 4, 1, 2], [1, 2, 3, 4]],
-      givens: [[0, 0, 0, 0], [2, 1, 0, 3], [0, 4, 0, 2], [0, 0, 3, 4]]
-    },
-    {
       solution: [[1, 3, 2, 4], [2, 4, 1, 3], [3, 1, 4, 2], [4, 2, 3, 1]],
       givens: [[1, 3, 2, 0], [2, 0, 1, 0], [0, 0, 0, 0], [4, 2, 0, 0]]
     },
     {
-      solution: [[4, 1, 3, 2], [3, 2, 4, 1], [1, 4, 2, 3], [2, 3, 1, 4]],
-      givens: [[4, 0, 0, 2], [0, 2, 0, 1], [0, 4, 2, 0], [2, 0, 0, 0]]
-    },
-    {
       solution: [[3, 1, 4, 2], [4, 2, 3, 1], [1, 3, 2, 4], [2, 4, 1, 3]],
       givens: [[0, 0, 4, 0], [0, 0, 0, 1], [1, 3, 0, 4], [0, 4, 0, 3]]
+    }
+  ];
+
+  const SUDOKU_HINTS = [
+    {
+      solution: [
+        [5, 3, 4, 6, 7, 8, 9, 1, 2],
+        [6, 7, 2, 1, 9, 5, 3, 4, 8],
+        [1, 9, 8, 3, 4, 2, 5, 6, 7],
+        [8, 5, 9, 7, 6, 1, 4, 2, 3],
+        [4, 2, 6, 8, 5, 3, 7, 9, 1],
+        [7, 1, 3, 9, 2, 4, 8, 5, 6],
+        [9, 6, 1, 5, 3, 7, 2, 8, 4],
+        [2, 8, 7, 4, 1, 9, 6, 3, 5],
+        [3, 4, 5, 2, 8, 6, 1, 7, 9]
+      ],
+      givens: [
+        [5, 3, 0, 0, 7, 0, 0, 0, 0],
+        [6, 0, 0, 1, 9, 5, 0, 0, 0],
+        [0, 9, 8, 0, 0, 0, 0, 6, 0],
+        [8, 0, 0, 0, 6, 0, 0, 0, 3],
+        [4, 0, 0, 8, 0, 3, 0, 0, 1],
+        [7, 0, 0, 0, 2, 0, 0, 0, 6],
+        [0, 6, 0, 0, 0, 0, 2, 8, 0],
+        [0, 0, 0, 4, 1, 9, 0, 0, 5],
+        [0, 0, 0, 0, 8, 0, 0, 7, 9]
+      ]
     }
   ];
 
@@ -138,8 +157,9 @@
     el.dirAcross = $('dir-across');
     el.dirDown = $('dir-down');
     el.btnCheck = $('btn-check');
-    el.btnHint = $('btn-hint');
+el.btnHint = $('btn-hint');
     el.btnClear = $('btn-clear');
+    el.hintLabel = $('hint-label');
     el.hintsLeft = $('hints-left');
 
     el.board = $('board');
@@ -151,11 +171,15 @@
     el.extrasCount = $('extras-count');
     el.keyboard = $('keyboard');
 
-    el.screenSudoku = $('screen-sudoku');
+el.screenSudoku = $('screen-sudoku');
     el.sudokuBoard = $('sudoku-board');
     el.sudokuKeys = $('sudoku-keys');
     el.sudokuStatus = $('sudoku-status');
+    el.sudokuTitle = $('sudoku-title');
+    el.sudokuLead = $('sudoku-lead');
+    el.sudokuRules = $('sudoku-rules');
     el.btnSudokuCheck = $('btn-sudoku-check');
+    el.btnSudokuCancel = $('btn-sudoku-cancel');
 
     el.modalMenu = $('modal-menu');
     el.modalHowto = $('modal-howto');
@@ -165,8 +189,10 @@
     el.modalAttempts = $('modal-attempts');
     el.btnAttemptsSudoku = $('btn-attempts-sudoku');
     el.hintText = $('hint-text');
+    el.hintTitle = $('hint-title');
     el.btnHintClose = $('btn-hint-close');
     el.btnHintOk = $('btn-hint-ok');
+    el.btnReveal = $('btn-reveal');
 
 
     el.btnMenuClose = $('btn-menu-close');
@@ -224,9 +250,11 @@ el.btnSound = $('btn-sound');
       console.warn('localStorage недоступен: прогресс сохранится только до перезагрузки.');
     }
 
-    Platform.init().then(function (ready) {
+Platform.init().then(function (ready) {
       if (ready) Platform.readyGameplay();
     });
+
+    if (window.Analytics) Analytics.init();
   }
 
   /* ---------------------------------------------------------------- меню */
@@ -376,7 +404,7 @@ el.btnSound = $('btn-sound');
         text: boardWord.text,
         accepted: C.normalizeAcceptedAnswers(question),
         difficulty: question.difficulty,
-        specialHint: question.specialHint || '',
+        specialHint: question.explanation || '',
         isGrid: true,
         number: boardWord.number,
         horizontal: boardWord.horizontal,
@@ -397,7 +425,7 @@ el.btnSound = $('btn-sound');
         text: text,
         accepted: C.normalizeAcceptedAnswers(question),
         difficulty: question.difficulty,
-        specialHint: question.specialHint || '',
+        specialHint: question.explanation || '',
         isGrid: false,
         number: null,
         horizontal: true,
@@ -445,11 +473,10 @@ el.btnSound = $('btn-sound');
       solved: solved,
       revealed: revealed,
       hintsLeft: saved.hintsLeft,
-      hintsUsed: saved.hintsUsed,
+hintsUsed: saved.hintsUsed,
       attemptsLeft: typeof saved.attemptsLeft === 'number'
         ? saved.attemptsLeft
         : C.ATTEMPTS_PER_LEVEL,
-      hintPlateShown: new Set(),
       activeId: null,
       activeIndex: 0,
       direction: 'across'
@@ -732,7 +759,7 @@ const num = document.createElement('span');
       return;
     }
 
-    const isSolved = game.solved.has(word.id);
+const isSolved = game.solved.has(word.id);
     const letters = word.cells.length;
 
     el.clueNumber.textContent = word.isGrid
@@ -746,6 +773,13 @@ const num = document.createElement('span');
     if (DIFFICULTY_LABELS[word.difficulty]) parts.push(DIFFICULTY_LABELS[word.difficulty]);
     if (isSolved) parts.push('разгадано');
     el.clueMeta.textContent = parts.join(' · ');
+
+    // После двух подсказок в слове предлагаем открыть ответ целиком.
+    if (el.btnReveal) {
+      const hintedCount = (game.revealed[word.id] || []).length;
+      const showReveal = !isSolved && hintedCount >= 2;
+      el.btnReveal.hidden = !showReveal;
+    }
   }
 
   function pluralLetters(count) {
@@ -784,8 +818,11 @@ function gridSolvedCount() {
     el.levelBarWrap.setAttribute('aria-valuenow', String(solvedCount));
     el.levelBarWrap.setAttribute('aria-valuemax', String(total));
 
-    el.hintsLeft.textContent = String(game.hintsLeft);
-    el.btnHint.disabled = game.hintsLeft <= 0;
+el.hintsLeft.textContent = String(game.hintsLeft);
+    if (el.hintLabel) {
+      el.hintLabel.textContent = game.hintsLeft <= 0 ? 'Заработать подсказки' : 'Подсказка';
+    }
+    el.btnHint.disabled = false;
   }
 
   /* ---------------------------------------------------------- геометрия */
@@ -1222,24 +1259,12 @@ function gridSolvedCount() {
       return;
     }
     if (game.hintsLeft <= 0) {
-      showToast('Подсказки на этот уровень закончились', true);
+      // Подсказки кончились — можно заработать ещё 3, решив судоку 9×9.
+      openSudoku('hints');
       return;
     }
 
-    // У некоторых вопросов подсказка — отдельная плашка с текстом.
-    if (word.specialHint && !game.hintPlateShown.has(word.id)) {
-      game.hintPlateShown.add(word.id);
-      game.hintsLeft -= 1;
-      game.hintsUsed += 1;
-      updateHud();
-      saveGame();
-      playTone(520, 0.08);
-      el.hintText.textContent = word.specialHint;
-      openModal(el.modalHint);
-      return;
-    }
-
-    if (isWordFilled(word)) {
+if (isWordFilled(word)) {
       const solved = checkWord(word, { auto: true });
       if (solved) return;
     }
@@ -1256,7 +1281,7 @@ if (openable.length === 0) {
       return;
     }
 
-    const target = openable[0];
+const target = openable[Math.floor(Math.random() * openable.length)];
     const state = game.cellState.get(target.cell.key);
     state.ch = word.text[target.index];
     state.fixed = true;
@@ -1282,7 +1307,22 @@ if (openable.length === 0) {
       return;
     }
 
-    if (isWordFilled(word)) checkWord(word, { auto: true });
+if (isWordFilled(word)) checkWord(word, { auto: true });
+  }
+
+  /* -------------------------------------------- не знаю ответ (показать) */
+  function revealAnswer() {
+    const word = activeWord();
+    if (!word) return;
+    if (game.solved.has(word.id)) {
+      showToast('Это слово уже разгадано');
+      return;
+    }
+    if (el.hintTitle) el.hintTitle.textContent = 'Ответ';
+    let text = 'Ответ — «' + word.display + '»';
+    if (word.specialHint) text += '\n\n' + word.specialHint;
+    el.hintText.textContent = text;
+    openModal(el.modalHint);
   }
 
 /* ------------------------------------------------------- прогресс */
@@ -1314,8 +1354,13 @@ if (openable.length === 0) {
       Platform.saveCloud({ progress: JSON.stringify(progress) });
     }
 
-    const isLast = game.levelIndex >= levelMeta.length - 1;
+const isLast = game.levelIndex >= levelMeta.length - 1;
     const level = levelMeta[game.levelIndex];
+
+    if (window.Analytics && Analytics.enabled()) {
+      Analytics.trackGoal('level' + (game.levelIndex + 1));
+      if (isLast) Analytics.trackGoal('all_levels');
+    }
 
     el.doneEyebrow.textContent = isLast ? 'Все уровни пройдены!' : 'Уровень пройден!';
     el.doneTitle.textContent = level.title;
@@ -1342,31 +1387,63 @@ if (openable.length === 0) {
     openModal(el.modalAttempts);
   }
 
-  function openSudoku() {
+  function openSudoku(kind) {
     if (!el.screenSudoku || !el.sudokuBoard) return;
 
+    // kind: 'attempts' (4×4, возвращает попытки) или 'hints' (9×9, даёт 3 подсказки).
+    const isHints = kind === 'hints';
+    const puzzlePool = isHints ? SUDOKU_HINTS : SUDOKU_ATTEMPTS;
+
     // Каждый раз новая судоку, но не та же, что в прошлый раз.
-    let puzzleIndex = Math.floor(Math.random() * SUDOKU_PUZZLES.length);
-    if (SUDOKU_PUZZLES.length > 1 && puzzleIndex === lastSudokuIndex) {
-      puzzleIndex = (puzzleIndex + 1 + Math.floor(Math.random() * (SUDOKU_PUZZLES.length - 1)))
-        % SUDOKU_PUZZLES.length;
+    let puzzleIndex = Math.floor(Math.random() * puzzlePool.length);
+    if (puzzlePool.length > 1 && puzzleIndex === lastSudokuIndex) {
+      puzzleIndex = (puzzleIndex + 1 + Math.floor(Math.random() * (puzzlePool.length - 1)))
+        % puzzlePool.length;
     }
     lastSudokuIndex = puzzleIndex;
-    const puzzle = SUDOKU_PUZZLES[puzzleIndex];
+    const puzzle = puzzlePool[puzzleIndex];
+    const size = puzzle.solution.length;
 
     sudokuState = {
       puzzle: puzzle,
+      size: size,
+      kind: kind,
       values: puzzle.givens.map(function (row) { return row.slice(); }),
       selected: null,
       solved: false,
       wrong: []
     };
 
+    if (el.sudokuTitle) {
+      el.sudokuTitle.textContent = isHints ? 'Судоку 9×9' : 'Судоку 4×4';
+    }
+    if (el.sudokuLead) el.sudokuLead.hidden = isHints;
+    if (el.sudokuRules) {
+      el.sudokuRules.innerHTML = isHints
+        ? '<li>В каждой строке цифры от 1 до 9 не повторяются.</li>'
+          + '<li>В каждом столбце — тоже не повторяются.</li>'
+          + '<li>В каждом квадрате 3×3 — тоже не повторяются.</li>'
+          + '<li>Клетки с цифрами уже заполнены, их менять нельзя.</li>'
+          + '<li>Заполните пустые клетки и нажмите «Проверить».</li>'
+        : '<li>В каждой строке цифры 1, 2, 3 и 4 встречаются по одному разу.</li>'
+          + '<li>В каждом столбце — тоже по одному разу.</li>'
+          + '<li>В каждом квадрате 2×2 — тоже по одному разу.</li>'
+          + '<li>Клетки с цифрами уже заполнены, их менять нельзя.</li>'
+          + '<li>Заполните пустые клетки и нажмите «Проверить».</li>';
+    }
+    if (el.btnSudokuCancel) el.btnSudokuCancel.hidden = !isHints;
+    const container = el.screenSudoku && el.screenSudoku.querySelector('.sudoku');
+    if (container) {
+      container.classList.toggle('sudoku--size9', isHints);
+      container.classList.toggle('sudoku--size4', !isHints);
+    }
+
     el.screenStart.hidden = true;
     el.screenGame.hidden = true;
     el.screenSudoku.hidden = false;
 
     setSudokuStatus('Заполните пустые клетки и нажмите «Проверить».', '');
+    buildSudokuKeys();
     renderSudoku();
     Platform.gameplayStop();
   }
@@ -1384,7 +1461,9 @@ if (openable.length === 0) {
     if (!el.sudokuKeys) return;
     el.sudokuKeys.innerHTML = '';
 
-    for (let digit = 1; digit <= 4; digit += 1) {
+    const size = sudokuState ? sudokuState.size : 4;
+
+    for (let digit = 1; digit <= size; digit += 1) {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'sudoku__key';
@@ -1404,12 +1483,25 @@ if (openable.length === 0) {
     el.sudokuKeys.appendChild(erase);
   }
 
+  // Размер «бокса» судоку: 2 для 4×4, 3 для 9×9.
+  function sudokuBoxSize() {
+    const n = sudokuState ? sudokuState.size : 4;
+    return n === 9 ? 3 : 2;
+  }
+
   function renderSudoku() {
     if (!sudokuState || !el.sudokuBoard) return;
     el.sudokuBoard.innerHTML = '';
 
-    for (let row = 0; row < 4; row += 1) {
-      for (let col = 0; col < 4; col += 1) {
+    const size = sudokuState.size;
+    const box = sudokuBoxSize();
+    el.sudokuBoard.style.gridTemplateColumns = 'repeat(' + size + ', 1fr)';
+    el.sudokuBoard.classList.toggle('sudoku__board--size4', size === 4);
+    el.sudokuBoard.classList.toggle('sudoku__board--size9', size === 9);
+
+    for (let row = 0; row < size; row += 1) {
+      for (let col = 0; col < size; col += 1) {
+        const idx = row * size + col;
         const value = sudokuState.values[row][col];
         const given = sudokuState.puzzle.givens[row][col] !== 0;
         const cell = document.createElement('button');
@@ -1433,12 +1525,14 @@ if (openable.length === 0) {
           cell.classList.add('sudoku__cell--wrong');
         }
 
-        if (col === 1) cell.classList.add('sudoku__cell--br');
-        if (row === 1) cell.classList.add('sudoku__cell--bb');
+        // Линии боксов: толстая граница справа перед новым боксом и снизу.
+        if ((col + 1) % box === 0 && col !== size - 1) cell.classList.add('sudoku__cell--br');
+        if ((row + 1) % box === 0 && row !== size - 1) cell.classList.add('sudoku__cell--bb');
 
         cell.setAttribute('aria-label', 'Строка ' + (row + 1) + ', столбец ' + (col + 1)
           + (value ? ', цифра ' + value : ', пусто') + (given ? ', нельзя менять' : ''));
 
+        cell.style.setProperty('--si', String(idx));
         cell.addEventListener('click', function () {
           if (!sudokuState) return;
           sudokuState.selected = { row: row, col: col };
@@ -1476,8 +1570,8 @@ if (openable.length === 0) {
     const wrong = [];
     let empty = 0;
 
-    for (let row = 0; row < 4; row += 1) {
-      for (let col = 0; col < 4; col += 1) {
+    for (let row = 0; row < sudokuState.size; row += 1) {
+      for (let col = 0; col < sudokuState.size; col += 1) {
         const value = sudokuState.values[row][col];
         if (!value) {
           empty += 1;
@@ -1509,14 +1603,25 @@ if (openable.length === 0) {
     playTone(880, 0.14);
 
     if (game) {
-      game.attemptsLeft = C.ATTEMPTS_PER_LEVEL;
+      if (sudokuState.kind === 'hints') {
+        game.hintsLeft = (game.hintsLeft || 0) + 3;
+        updateHud();
+      } else {
+        game.attemptsLeft = C.ATTEMPTS_PER_LEVEL;
+        updateHud();
+      }
       saveGame();
-      updateHud();
     }
+
+    const solvedKind = sudokuState.kind;
 
     window.setTimeout(function () {
       closeSudoku();
-      showToast('Попытки восстановлены: ' + C.ATTEMPTS_PER_LEVEL);
+      if (solvedKind === 'hints') {
+        showToast('Заработано ещё 3 подсказки');
+      } else {
+        showToast('Попытки восстановлены: ' + C.ATTEMPTS_PER_LEVEL);
+      }
     }, 1100);
   }
 
@@ -1598,8 +1703,12 @@ if (openable.length === 0) {
 
     el.btnAttemptsSudoku.addEventListener('click', function () {
       closeModal(el.modalAttempts);
-      openSudoku();
+      openSudoku('attempts');
     });
+
+    if (el.btnSudokuCancel) {
+      el.btnSudokuCancel.addEventListener('click', function () { closeSudoku(); });
+    }
 
     el.extrasToggle.addEventListener('click', function () {
       var open = el.extras.classList.toggle('is-open');
@@ -1649,7 +1758,8 @@ function toggleSound() {
 
     el.btnCheck.addEventListener('click', checkCurrent);
     el.btnSudokuCheck.addEventListener('click', checkSudoku);
-    el.btnHint.addEventListener('click', useHint);
+el.btnHint.addEventListener('click', useHint);
+    if (el.btnReveal) el.btnReveal.addEventListener('click', revealAnswer);
     el.btnClear.addEventListener('click', clearWord);
 
     el.dirAcross.addEventListener('click', function () { switchDirection('across'); });
@@ -1748,7 +1858,8 @@ function updateSoundUi() {
 
     if (el.screenSudoku && !el.screenSudoku.hidden) {
       const sudokuKey = event.key;
-      if (/^[1-4]$/.test(sudokuKey)) {
+      const sudokuSize = sudokuState ? sudokuState.size : 4;
+      if (/^[1-9]$/.test(sudokuKey) && Number(sudokuKey) <= sudokuSize) {
         event.preventDefault();
         sudokuSet(Number(sudokuKey));
       } else if (sudokuKey === 'Backspace' || sudokuKey === 'Delete') {

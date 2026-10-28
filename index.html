@@ -95,11 +95,12 @@
           <div class="clue-card__actions">
             <button class="btn btn--primary" id="btn-check" type="button">Проверить</button>
             <button class="btn" id="btn-hint" type="button">
-              Подсказка
+              <span id="hint-label">Подсказка</span>
               <span class="pill" id="hints-left">3</span>
             </button>
             <button class="btn btn--ghost" id="btn-clear" type="button">Очистить</button>
           </div>
+          <button class="btn btn--wide btn--reveal" id="btn-reveal" type="button" hidden>Не знаю ответ</button>
         </section>
 
         <div class="board-panel" id="board-panel">
@@ -128,8 +129,8 @@
       <div class="sudoku">
         <header class="sudoku__head">
           <p class="eyebrow">Мини-игра</p>
-          <h1 class="sudoku__title">Судоку 4×4</h1>
-          <p class="sudoku__lead">
+          <h1 class="sudoku__title" id="sudoku-title">Судоку 4×4</h1>
+          <p class="sudoku__lead" id="sudoku-lead">
             Попытки на уровне закончились. Соберите судоку — и вернётесь к тому же
             уровню кроссворда с новыми попытками.
           </p>
@@ -137,21 +138,23 @@
 
         <div class="sudoku__body">
           <div class="sudoku__play">
-            <div class="sudoku__board" id="sudoku-board" role="grid" aria-label="Судоку 4 на 4"></div>
+            <div class="sudoku__board" id="sudoku-board" role="grid" aria-label="Судоку"></div>
 
             <div class="sudoku__keys" id="sudoku-keys" aria-label="Цифры для судоку"></div>
 
             <button class="btn btn--primary btn--wide" id="btn-sudoku-check" type="button">Проверить</button>
             <p class="sudoku__status" id="sudoku-status" role="status" aria-live="polite"></p>
+
+            <button class="btn btn--ghost btn--wide" id="btn-sudoku-cancel" type="button">Вернуться к кроссворду</button>
           </div>
 
           <aside class="sudoku__rules">
             <h2 class="sudoku__rules-title">Правила</h2>
-            <ul>
-              <li>Поле 4×4 разделено на четыре квадрата 2×2.</li>
-              <li>В каждой строке цифры 1, 2, 3 и 4 встречаются по одному разу.</li>
-              <li>В каждом столбце — тоже по одному разу.</li>
-              <li>В каждом квадрате 2×2 — тоже по одному разу.</li>
+            <ul id="sudoku-rules">
+              <li>Заполните пустые клетки цифрами от 1 до 9.</li>
+              <li>В каждой строке цифры не повторяются.</li>
+              <li>В каждом столбце — тоже не повторяются.</li>
+              <li>В каждом квадрате 3×3 — тоже не повторяются.</li>
               <li>Клетки с цифрами уже заполнены, их менять нельзя.</li>
               <li>Заполните пустые клетки и нажмите «Проверить».</li>
             </ul>
@@ -285,6 +288,7 @@
   <script src="js/storage.js"></script>
   <script src="js/platform.js"></script>
   <script src="js/ads.js"></script>
+  <script src="js/analytics.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

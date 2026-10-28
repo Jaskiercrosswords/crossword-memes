@@ -1053,6 +1053,21 @@ button {
   font-size: 14px;
   line-height: 1.5;
   color: #5c3446;
+  white-space: pre-line;
+}
+
+.btn--reveal {
+  margin-top: 10px;
+  border-color: #eda9c5;
+  background: #ffeff6;
+  color: #a1325c;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.btn--reveal:hover {
+  background: #ffe4ef;
+  border-color: var(--accent);
 }
 
 
@@ -1300,6 +1315,10 @@ button {
   margin: 0 auto;
 }
 
+.sudoku--size9 .sudoku__play {
+  max-width: 400px;
+}
+
 .sudoku__board {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1323,12 +1342,24 @@ button {
   transition: background 0.14s ease, color 0.14s ease;
 }
 
-.sudoku__cell:nth-child(4n) {
+.sudoku__board--size4 .sudoku__cell:nth-child(4n) {
   border-right: 0;
 }
 
-.sudoku__cell:nth-last-child(-n + 4) {
+.sudoku__board--size4 .sudoku__cell:nth-last-child(-n + 4) {
   border-bottom: 0;
+}
+
+.sudoku__board--size9 .sudoku__cell:nth-child(9n) {
+  border-right: 0;
+}
+
+.sudoku__board--size9 .sudoku__cell:nth-last-child(-n + 9) {
+  border-bottom: 0;
+}
+
+.sudoku__board--size9 .sudoku__cell {
+  font-size: clamp(14px, 3.4vw, 20px);
 }
 
 .sudoku__cell--br {
@@ -1360,6 +1391,22 @@ button {
   gap: 6px;
   justify-content: center;
   margin: 14px 0 12px;
+}
+
+.sudoku--size9 .sudoku__keys {
+  flex-wrap: wrap;
+}
+
+.sudoku--size9 .sudoku__key {
+  flex: 0 1 40px;
+  min-height: 40px;
+  font-size: 16px;
+}
+
+.sudoku--size9 .sudoku__key--wide {
+  flex: 0 1 100%;
+  max-width: none;
+  font-size: 12px;
 }
 
 .sudoku__key {

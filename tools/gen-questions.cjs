@@ -1,7 +1,9 @@
 /*
  * Генерирует js/questions.js из кроссворд.docx в корне папки Кроссворд.
- * Вопросы и ответы переносятся дословно; убирается только обёртка
- * «N. …? - ответ "..."». Английские слова сохраняются.
+ * Вопросы и ответы переносятся дословно. Строки «Пояснение: …» привязываются
+ * к предыдущему вопросу как поле explanation. Номера в тексте не являются
+ * источником id: id присваивается по порядку появления (1..N).
+ * Английские слова сохраняются.
  * Запуск: multitool-node tools/gen-questions.cjs
  */
 'use strict';
@@ -36,14 +38,18 @@ function extractDocx(docxPath) {
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'");
-  return text.split('\n').map((l) => l.trim()).filter(Boolean);
+  return text.split('\n').map((l) => l.replace(/^\uFEFF/, '').trim()).filter(Boolean);
 }
 
 function parseLine(line) {
-  const m = line.match(/^(\d+)\.\s*(.*)$/);
-  if (!m) return null;
-  const id = parseInt(m[1], 10);
-  let rest = m[2].trim();
+  // Снимаем возможный порядковый номер в начале, но сохраняем «20.31» (время),
+  // у которого после первой точки идёт ещё цифра с последующим текстом.
+  let rest = line.trim();
+  const numMatch = /^(\d+)\.\s*(.*)$/.exec(rest);
+  if (numMatch && !/^\d/.test(numMatch[2])) {
+    // e.g. «12. вопрос» — это номер; «20.31 прибыл» — время, оставляем как есть.
+    rest = numMatch[2].trim();
+  }
   if (!rest) return null;
 
   function takeAnswer(after) {
@@ -77,10 +83,10 @@ function parseLine(line) {
     answer = takeAnswer(rest.slice(open));
   }
 
-  question = question.replace(/[-–—:：]+\s*$/, '').replace(/\s*\?+\s*$/, '').trim();
+  question = question.replace(/[-–—:]+\s*$/, '').trim();
 
   if (!question || !answer) return null;
-  return { id, question, answer };
+  return { question, answer };
 }
 
 function jsString(value) {
@@ -89,46 +95,40 @@ function jsString(value) {
 
 function main() {
   const lines = extractDocx(docx);
+
+  // Собираем последовательность «вопрос» и «пояснение».
   const entries = [];
-  const seen = new Map();
+  let current = null;
   lines.forEach((line) => {
-    const parsed = parseLine(line);
-    if (!parsed) return;
-    if (seen.has(parsed.id)) {
-      console.error('Дважды встречен id', parsed.id, '— строка:', line);
+    const explMatch = line.match(/^Пояснение\s*[:：]\s*(.*)/i);
+    if (explMatch) {
+      if (current) current.explanation = (current.explanation ? current.explanation + ' ' : '') + explMatch[1].trim();
       return;
     }
-    seen.set(parsed.id, true);
-    entries.push(parsed);
+    const parsed = parseLine(line);
+    if (!parsed) return;
+    current = parsed;
+    entries.push(current);
   });
 
-  entries.sort((a, b) => a.id - b.id);
   console.log('Разобрано вопросов:', entries.length);
 
-  // Особые подсказки-плашки (добавлены ранее по просьбе автора; вопросы те же).
-  const specialHints = {
-    10: 'от английского chill out',
-    12: 'один из героев аниме Магическая Битва',
-    15: 'название фильма',
-    72: 'написали песни Нон-Стоп и Контракт',
-    78: 'популярная игра',
-    81: 'в 2023 году на свет одновременно вышли два совершенно разных фильма ставшие кассовым противостоянием, люди приходили на показы в сочетании розового и черного'
-  };
-
-  // Допустимые варианты написания: как есть + без пробелов/дефисов.
-  const body = entries.map((e) => {
+  // Допустимые варианты написания: как есть.
+  const body = entries.map((e, i) => {
+    const id = i + 1;
     const answerJs = jsString(e.answer);
     const accepted = [e.answer];
-    const hint = specialHints[e.id] ? ', specialHint: ' + jsString(specialHints[e.id]) : '';
-    return '    { id: ' + e.id + ', question: ' + jsString(e.question)
+    const expl = e.explanation ? ', explanation: ' + jsString(e.explanation) : '';
+    return '    { id: ' + id + ', question: ' + jsString(e.question)
       + ', answer: ' + answerJs
       + ', acceptedAnswers: ' + JSON.stringify(accepted)
-      + hint + ' },';
+      + expl + ' },';
   }).join('\n');
 
   const header = `/*
  * Все вопросы игры. Содержимое перенесено дословно из кроссворд.docx
  * (формулировки и ответы автора не изменялись; английские слова сохранены).
+ * Поле explanation содержит авторское пояснение (если есть).
  */
 (function (global) {
   'use strict';
@@ -147,7 +147,6 @@ ${body}
 
   fs.writeFileSync(OUT, header, 'utf8');
   console.log('Записано:', OUT);
-  console.log('Использованы id: от', entries[0] && entries[0].id, 'до', entries[entries.length - 1] && entries[entries.length - 1].id);
 }
 
 main();
