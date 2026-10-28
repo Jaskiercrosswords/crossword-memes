@@ -603,9 +603,9 @@
       const clue = document.createElement('p');
       clue.className = 'extra__clue';
 
-      const num = document.createElement('span');
+const num = document.createElement('span');
       num.className = 'extra__num';
-      num.textContent = 'Без сетки.';
+      num.textContent = /^[0-9]+$/.test(word.text) ? 'Число.' : 'Без сетки.';
       clue.appendChild(num);
       clue.appendChild(document.createTextNode(' ' + word.question));
       card.appendChild(clue);

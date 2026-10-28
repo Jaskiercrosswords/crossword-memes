@@ -20,7 +20,7 @@
     { id: 12, question: "20.31 прибыл", answer: "годжо сатору", acceptedAnswers: ["годжо сатору"], specialHint: "один из героев аниме Магическая Битва" },
     { id: 13, question: "Российский \"брат\" ютуба", answer: "рутуб", acceptedAnswers: ["рутуб"] },
     { id: 14, question: "Что производил Главный герой в фильме бойцовский клуб", answer: "мыло", acceptedAnswers: ["мыло"] },
-    { id: 15, question: "Дьявол носит", answer: "Prada", acceptedAnswers: ["Prada"], specialHint: "название фильма" },
+    { id: 15, question: "Дьявол носит", answer: "прада", acceptedAnswers: ["прада"], specialHint: "название фильма" },
     { id: 16, question: "Американский анимационный ситком про семью, где все персонажи желтые", answer: "симпсоны", acceptedAnswers: ["симпсоны"] },
     { id: 17, question: "Популярный мем \"это фиаско,.. \"", answer: "братан", acceptedAnswers: ["братан"] },
     { id: 18, question: "Дружелюбный сосед", answer: "человек паук", acceptedAnswers: ["человек паук"] },
