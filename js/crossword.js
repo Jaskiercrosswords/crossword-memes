@@ -137,63 +137,36 @@
   }
 
   /**
-   * Делит вопросы на уровни без тематических групп: темы перемешаны,
-   * а длинные и короткие слова распределены по уровням равномерно,
-   * чтобы каждая сетка собиралась.
-   *
-   * Всё, что не влезло в сетку (длинные ответы и остаток), становится
-   * дополнительными вопросами последнего уровня.
+   * Делит вопросы на 10 уровней по 10 (без тематических групп). Длинные
+   * и короткие слова распределяются равномерно, чтобы сетки собирались.
+   * Слова, которым не нашлось места в сетке уровня, становятся
+   * дополнительными словами того же уровня (их всё равно нужно решить).
    */
   function buildLevels(questions) {
     const shuffled = shuffleWithSeed(questions, 20261027);
-
     const withText = shuffled.map(function (item) {
       return { question: item, text: getGridText(item) };
     });
 
-    const tooLong = withText.filter(function (item) {
-      return item.text.length > MAX_WORD_LENGTH || /^[0-9]+$/.test(item.text);
-    });
+    const levelsCount = Math.ceil(questions.length / WORDS_PER_LEVEL);
 
-    const fit = withText.filter(function (item) {
-      return tooLong.indexOf(item) === -1;
-    });
-
-    const levelsCount = Math.max(1, Math.floor(fit.length / WORDS_PER_LEVEL));
-    const gridCount = levelsCount * WORDS_PER_LEVEL;
-
-    const sorted = fit.slice().sort(function (a, b) {
+    // Сначала длинные, чтобы длинные легли в первые корзины равномерно.
+    const sorted = withText.slice().sort(function (a, b) {
       if (b.text.length !== a.text.length) return b.text.length - a.text.length;
-      return a.question.id - b.question.id;
-    });
-
-    const gridPool = sorted.slice(Math.max(0, sorted.length - gridCount));
-    const leftover = sorted.slice(0, Math.max(0, sorted.length - gridCount)).map(function (item) {
-      return item.question;
-    });
-
-    const extraQuestions = tooLong.map(function (item) {
-      return item.question;
-    }).concat(leftover).sort(function (a, b) {
-      return a.id - b.id;
-    });
-
-    // Дополнительные вопросы живут на разных уровнях: 3, 5 и 8.
-    const EXTRA_LEVEL_INDEXES = [2, 4, 7];
-    const extraByLevel = new Map();
-    extraQuestions.forEach(function (question, position) {
-      const target = Math.min(
-        EXTRA_LEVEL_INDEXES[position % EXTRA_LEVEL_INDEXES.length],
-        levelsCount - 1
-      );
-      if (!extraByLevel.has(target)) extraByLevel.set(target, []);
-      extraByLevel.get(target).push(question);
+      return b.question.id - a.question.id;
     });
 
     const buckets = [];
-    for (let index = 0; index < levelsCount; index += 1) buckets.push([]);
-    gridPool.forEach(function (item, index) {
-      buckets[index % levelsCount].push(item.question);
+    for (let index = 0; index < levelsCount; index += 1) {
+      buckets.push([]);
+    }
+    sorted.forEach(function (item) {
+      // Ищем корзину с наименьшим суммарным количеством букв.
+      let best = 0;
+      for (let index = 1; index < levelsCount; index += 1) {
+        if (bucketWeight(buckets[index]) < bucketWeight(buckets[best])) best = index;
+      }
+      buckets[best].push(item.question);
     });
 
     return buckets.map(function (items, index) {
@@ -203,9 +176,18 @@
         id: 'level-' + (index + 1),
         title: 'Уровень ' + (index + 1),
         questions: mixed,
-        extraQuestions: extraByLevel.get(index) || []
+        extraQuestions: []
       };
     });
+  }
+
+  /** Суммарная длина всех слов в корзине (упрощённо — количество букв). */
+  function bucketWeight(items) {
+    let total = 0;
+    items.forEach(function (item) {
+      total += getGridText(item).length;
+    });
+    return total;
   }
 
   /* ------------------------------------------------------------------ */
